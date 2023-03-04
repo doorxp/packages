@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=acme-common
-PKG_VERSION:=1.0.1
+PKG_VERSION:=1.0.2
 
 PKG_MAINTAINER:=Toke Høiland-Jørgensen <toke@toke.dk>
 PKG_LICENSE:=GPL-3.0-only
@@ -34,11 +34,10 @@ define Package/acme-common/conffiles
 endef
 
 define Package/acme-common/install
+	$(INSTALL_DIR) $(1)/etc/acme
 	$(INSTALL_DIR) $(1)/etc/ssl/acme
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/acme.config $(1)/etc/config/acme
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) ./files/acme.sh $(1)/usr/bin/acme
 	$(INSTALL_DIR) $(1)/usr/lib/acme
 	$(INSTALL_DATA) ./files/functions.sh $(1)/usr/lib/acme
 	$(INSTALL_BIN) ./files/acme-notify.sh $(1)/usr/lib/acme/notify
@@ -49,15 +48,19 @@ define Package/acme-common/install
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/acme
 endef
 
-define Package/acme/postinst
+define Package/acme-common/postinst
 #!/bin/sh
-grep -q '/usr/bin/acme' /etc/crontabs/root 2>/dev/null && exit 0
-echo "0 0 * * * /usr/bin/acme get" >> /etc/crontabs/root
+if [ -z "$$IPKG_INSTROOT" ]; then
+	grep -q '/etc/init.d/acme' /etc/crontabs/root 2>/dev/null && exit 0
+	echo "0 0 * * * /etc/init.d/acme start" >> /etc/crontabs/root
+fi
 endef
 
 define Package/acme-common/prerm
 #!/bin/sh
-sed -i '\|/usr/bin/acme|d' /etc/crontabs/root
+if [ -z "$$IPKG_INSTROOT" ]; then
+	sed -i '\|/etc/init.d/acme|d' /etc/crontabs/root
+fi
 endef
 
 define Build/Configure

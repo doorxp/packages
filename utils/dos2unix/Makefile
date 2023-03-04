@@ -5,13 +5,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dos2unix
-PKG_VERSION:=7.4.3
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=7.4.4
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://waterlan.home.xs4all.nl/dos2unix/ \
                 @SF/dos2unix
-PKG_HASH:=b68db41956daf933828423aa30510e00c12d29ef5916e715e8d4e694fe66ca72
+PKG_HASH:=28a841db0bd5827d645caba9d8015e3a71983dc6e398070b5287ee137ae4436e
 
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 PKG_LICENSE:=BSD-2-Clause
@@ -22,7 +22,7 @@ PKG_INSTALL:=1
 
 include $(INCLUDE_DIR)/package.mk
 
-MAKE_FLAGS+= D2U_OS=Linux
+MAKE_FLAGS+= D2U_OS=Linux ENABLE_NLS=
 
 define dos2unix/template
   define Package/$(1)
